@@ -1,0 +1,32 @@
+x-app: &app
+  build: .
+  restart: always
+  env_file:
+    - .env
+  volumes:
+    - .:/code
+  links:
+    - db
+    - redis
+  depends_on:
+    - db
+    - redis
+
+services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=channelstutorial
+      - POSTGRES_PASSWORD=channelstutorial
+      - POSTGRES_DB=channelstutorial
+    ports:
+      - "5432:5432"
+  web:
+    <<: *app
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "127.0.0.1:8000:8000"
